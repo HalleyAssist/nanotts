@@ -1462,11 +1462,13 @@ int main( int argc, const char ** argv )
 
     //
     if ( (res = nano.parse_commandline_arguments()) < 0 ) {
-        nano.destroy();
         if ( res == -666 ) {
+            nano.destroy();
             return 0;
         }
         nano.PrintUsage();
+        
+        nano.destroy();
         return 127; // command not found
     }
 
