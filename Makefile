@@ -7,6 +7,7 @@ CFLAGS_OPT = -O2
 SHELL := /bin/bash
 PICO_LANG_ROOT := /usr/share/pico
 PICO_LANG_LOCATION := $(PICO_LANG_ROOT)/lang/
+EXTRA_CONFIGURE ?= 
 
 #LINKER_FLAGS := -lasound -lao
 #LINKER_FLAGS := -lasound -lm
@@ -64,7 +65,7 @@ $(OBJECTS_DIR):
 	@[ -d $(OBJECTS_DIR) ] || mkdir $(OBJECTS_DIR)
 
 $(PICO_LIBRARY):
-	cd svoxpico; ./autogen.sh && ./configure && make
+	cd svoxpico; ./autogen.sh && ./configure $(EXTRA_CONFIGURE) && make
 
 $(PROGRAM): update_build_version $(PICO_LIBRARY) $(OBJECTS_DIR) $(OBJECTS)
 	g++ -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
