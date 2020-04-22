@@ -16,6 +16,8 @@ CXX ?= g++
 #LINKER_FLAGS := -lasound -lm
 LINKER_FLAGS := -lm
 
+export
+
 all: $(PROGRAM)
 
 OBJECTS_DIR = objs
@@ -68,7 +70,7 @@ $(OBJECTS_DIR):
 	@[ -d $(OBJECTS_DIR) ] || mkdir $(OBJECTS_DIR)
 
 $(PICO_LIBRARY):
-	cd svoxpico; ./autogen.sh && ./configure $(EXTRA_CONFIGURE) && make CFLAGS=$(CFLAGS) CC=$(CC) CXX=$(CXX)
+	cd svoxpico; ./autogen.sh && ./configure $(EXTRA_CONFIGURE) && make
 
 $(PROGRAM): update_build_version $(PICO_LIBRARY) $(OBJECTS_DIR) $(OBJECTS)
 	$(CXX) -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
