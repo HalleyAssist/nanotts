@@ -1,13 +1,16 @@
 
 PROGRAM = nanotts
 PICO_LIBRARY = svoxpico/.libs/libttspico.a
-CFLAGS = -Wall
+CFLAGS ?= -Wall
 CFLAGS_DEBUG = -g
 CFLAGS_OPT = -O2
 SHELL := /bin/bash
 PICO_LANG_ROOT := /usr/share/pico
 PICO_LANG_LOCATION := $(PICO_LANG_ROOT)/lang/
 EXTRA_CONFIGURE ?= 
+
+CC ?= gcc
+CXX ?= g++
 
 #LINKER_FLAGS := -lasound -lao
 #LINKER_FLAGS := -lasound -lm
@@ -56,22 +59,22 @@ endif
 noalsa: $(PROGRAM)
 
 $(ALSA_OBJECT): $(ALSA_SOURCE)
-	g++ $(CFLAGS) -c -o $@ $^ -lasound
+	$(CXX) $(CFLAGS) -c -o $@ $^ -lasound
 
 $(OBJECTS_DIR)/%.o: ./src/%.cpp
-	g++ -I. -I./svoxpico $(CFLAGS) -c $^ -o $@  $(LINKER_FLAGS)
+	$(CXX) -I. -I./svoxpico $(CFLAGS) -c $^ -o $@  $(LINKER_FLAGS)
 
 $(OBJECTS_DIR):
 	@[ -d $(OBJECTS_DIR) ] || mkdir $(OBJECTS_DIR)
 
 $(PICO_LIBRARY):
-	cd svoxpico; ./autogen.sh && ./configure $(EXTRA_CONFIGURE) && make
+	cd svoxpico; ./autogen.sh && ./configure $(EXTRA_CONFIGURE) && make CFLAGS=$(CFLAGS) CC=$(CC) CXX=$(CXX)
 
 $(PROGRAM): update_build_version $(PICO_LIBRARY) $(OBJECTS_DIR) $(OBJECTS)
-	g++ -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
+	$(CXX) -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
 
 debug: update_build_version $(PICO_LIBRARY) $(OBJECTS_DIR) $(OBJECTS)
-	g++ -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
+	$(CXX) -L./svoxpico/.libs $(OBJECTS) $(PICO_LIBRARY) $(CFLAGS) -o $(PROGRAM) $(LINKER_FLAGS)
 
 clean:
 	@for file in $(OBJECTS) $(PROGRAM) pico2wave.o pico2wave build_version.h; do if [ -f $${file} ]; then rm $${file}; echo rm $${file}; fi; done
@@ -82,8 +85,8 @@ distclean: clean
 	cd svoxpico; make clean ; ./clean.sh
 
 pico: $(PICO_LIBRARY)
-	gcc -I. -I./svoxpico -Wall -g $(OPT_FLAG) -c -o pico2wave.o src/pico2wave.c
-	gcc -I./svoxpico -Wall -g $(OPT_FLAG) pico2wave.o svoxpico/.libs/libttspico.a -o pico2wave -lm -lpopt
+	$(CC) -I. -I./svoxpico -Wall -g $(OPT_FLAG) -c -o pico2wave.o src/pico2wave.c
+	$(CC) -I./svoxpico -Wall -g $(OPT_FLAG) pico2wave.o svoxpico/.libs/libttspico.a -o pico2wave -lm -lpopt
 
 both: $(PROGRAM) pico
 
