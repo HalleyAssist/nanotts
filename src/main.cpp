@@ -471,10 +471,6 @@ int Nano::parse_commandline_arguments()
     }                                   \
 }while(0)
 
-    if ( ! isatty(fileno(stdin)) ) {
-        in_mode = IN_STDIN;
-    }
-
     for ( int i = 1; i < my_argc; i++ )
     {
         // PRINT HELP
